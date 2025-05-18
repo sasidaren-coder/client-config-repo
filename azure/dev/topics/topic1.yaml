@@ -1,6 +1,6 @@
-pipeline_version: 1.0.1
+pipeline_version: 1.0.0
 topic:
-  name: "orders-testcommon"
-  partitions: 3
+  name: "tg-top1"
+  partitions: 1
   config:
     cleanup.policy: "delete"
