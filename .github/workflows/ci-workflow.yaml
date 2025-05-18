@@ -27,20 +27,27 @@ jobs:
 
           files_json=$(echo '${{ steps.changed-files.outputs.all_changed_files }}' | jq -R 'split(" ") | map(select(length > 0))')
 
-          echo "Changed files: $files_json"
+          echo "Changed files:"
+          echo "$files_json" | jq .
 
           matrix_entries=$(jq -n --argjson files "$files_json" '
-            [ 
-              $files[] | 
-              {
-                file: .,
-                cloud: (split("/")[0]),
-                env: (split("/")[1])
-              }
-            ]
+            {
+              include: [ 
+                $files[] | 
+                {
+                  file: .,
+                  cloud: (split("/")[0]),
+                  env: (split("/")[1])
+                }
+              ]
+            }
           ')
 
-          echo "matrix={\"include\": $matrix_entries}" >> "$GITHUB_OUTPUT"
+          echo "Full matrix JSON:"
+          echo "$matrix_entries" | jq .
+
+          # Safely write to $GITHUB_OUTPUT
+          echo "matrix=$(echo "$matrix_entries" | jq -c .)" >> "$GITHUB_OUTPUT"
 
   terragrunt-plan:
     name: Terragrunt Plan
