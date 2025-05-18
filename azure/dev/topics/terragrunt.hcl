@@ -17,7 +17,7 @@ locals {
 }
 
 terraform {
-  source = "git::git@github.com:your-org/iac-modules.git//modules/kafka-topic?ref=v${local.iac_version}"
+  source = "git::git@github.com:sasidaren-coder/iac-repo.git//modules/kafka-topics?ref=v${local.iac_version}"
 }
 
 inputs = {
