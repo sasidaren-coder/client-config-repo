@@ -57,6 +57,17 @@ jobs:
       matrix: ${{fromJson(needs.detect-changes.outputs.matrix)}}
     environment: ${{ matrix.env }}
 
+    env:
+          CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
+          CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
+          KAFKA_API_KEY: ${{ secrets.KAFKA_API_KEY }}
+          KAFKA_API_SECRET: ${{ secrets.KAFKA_API_SECRET }}
+          KAFKA_CLUSTER_ID: ${{ secrets.KAFKA_CLUSTER_ID }}
+          KAFKA_REST_ENDPOINT: ${{ secrets.KAFKA_REST_ENDPOINT }}
+          AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+          
     steps:
       - uses: actions/checkout@v4
 
@@ -88,13 +99,4 @@ jobs:
       - name: Terragrunt Plan
         working-directory: ${{ env.DIR_PATH }}
         run: terragrunt plan
-        env:
-          CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
-          CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
-          KAFKA_API_KEY: ${{ secrets.KAFKA_API_KEY }}
-          KAFKA_API_SECRET: ${{ secrets.KAFKA_API_SECRET }}
-          KAFKA_CLUSTER_ID: ${{ secrets.KAFKA_CLUSTER_ID }}
-          KAFKA_REST_ENDPOINT: ${{ secrets.KAFKA_REST_ENDPOINT }}
-          AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
+        
