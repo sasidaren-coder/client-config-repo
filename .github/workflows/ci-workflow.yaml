@@ -1,0 +1,95 @@
+name: Confluent IaC CI Workflow
+
+on:
+  pull_request:
+    paths:
+      - '**/topics/*.yaml'
+
+jobs:
+  detect-changes:
+    name: Detect changed YAMLs
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get list of changed/added files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: '**/topics/*.yaml'
+
+      - name: Set matrix from changed files
+        id: set-matrix
+        run: |
+          changed_files=$(echo '${{ steps.changed-files.outputs.all_changed_files }}' | jq -R 'split(" ")')
+          echo "Changed Files:"
+          echo $changed_files | jq .
+          echo "matrix={\"file\": $changed_files}" >> "$GITHUB_OUTPUT"
+
+  terragrunt-plan:
+    name: Run terragrunt plan
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.detect-changes.outputs.matrix)}}
+    environment: ${{ matrix.file && matrix.file != '' && fromJson('["dev","uat","prod"]').find(e => matrix.file.contains('/' + e + '/')) }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract env and cloud from file path
+        id: extract-vars
+        run: |
+          FILE_PATH=${{ matrix.file }}
+          echo "YAML file: $FILE_PATH"
+
+          # e.g., FILE_PATH=azure/dev/topics/topic1.yaml
+          CLOUD=$(echo "$FILE_PATH" | cut -d '/' -f1)
+          ENV=$(echo "$FILE_PATH" | cut -d '/' -f2)
+          DIR_PATH=$(dirname "$FILE_PATH")
+
+          echo "cloud_provider=$CLOUD" >> "$GITHUB_ENV"
+          echo "env=$ENV" >> "$GITHUB_ENV"
+          echo "dir_path=$DIR_PATH" >> "$GITHUB_ENV"
+
+      - name: Set environment-specific secrets
+        run: |
+          echo "CLOUD_PROVIDER=$CLOUD" >> $GITHUB_ENV
+          echo "ENV=$ENV" >> $GITHUB_ENV
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Install Terragrunt
+        run: |
+          wget -q https://github.com/gruntwork-io/terragrunt/releases/download/v0.56.3/terragrunt_linux_amd64
+          chmod +x terragrunt_linux_amd64
+          sudo mv terragrunt_linux_amd64 /usr/local/bin/terragrunt
+
+      - name: Terragrunt Init
+        working-directory: ${{ env.dir_path }}
+        run: terragrunt init
+
+      - name: Terragrunt Validate
+        working-directory: ${{ env.dir_path }}
+        run: terragrunt validate
+
+      - name: Terragrunt Plan
+        working-directory: ${{ env.dir_path }}
+        run: terragrunt plan
+        env:
+          CONFLUENT_API_KEY: ${{ secrets.CONFLUENT_API_KEY }}
+          CONFLUENT_API_SECRET: ${{ secrets.CONFLUENT_API_SECRET }}
+          KAFKA_API_KEY: ${{ secrets.KAFKA_API_KEY }}
+          KAFKA_API_SECRET: ${{ secrets.KAFKA_API_SECRET }}
+          KAFKA_CLUSTER_ID: ${{ secrets.KAFKA_CLUSTER_ID }}
+          KAFKA_REST_ENDPOINT: ${{ secrets.KAFKA_REST_ENDPOINT }}
+          AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
