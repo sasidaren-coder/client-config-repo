@@ -49,7 +49,7 @@ jobs:
     strategy:
       matrix:
         include: ${{ fromJson(needs.detect-and-dispatch.outputs.matrix) }}
-    uses: sasidaren-coder/iac-repo/.github/workflows/ci-workflow.yaml
+    uses: sasidaren-coder/iac-repo/.github/workflows/ci-workflow.yaml@v1.0.0
     with:
       file: ${{ matrix.file }}
       cloud: ${{ matrix.cloud }}
