@@ -5,7 +5,7 @@ Confluent Cloud Client Config Repo
 # For Local testing only:
 
 
-cd /Users/sasidarendinakaran/Documents/Lumen/Internals/Automation/lumen_automation_v2/local_tf_executions/terragrunt_impls/client-config-repo/azure/dev/topics
+cd /Users/sasidarendinakaran/Documents/<Client>/Internals/Automation/<Client>_automation_v2/local_tf_executions/terragrunt_impls/client-config-repo/azure/dev/topics
 
 
 export CLOUD_PROVIDER=azure
@@ -20,8 +20,8 @@ export AZURE_RESOURCE_GROUP_NAME=<Azure RG>
 export AZURE_STORAGE_ACCOUNT_NAME=<Azure Storage Account>
 export AZURE_STORAGE_CONTAINER_NAME=<Azure Container name>
 
-terragrunt init --source /Users/sasidarendinakaran/Documents/Lumen/Internals/Automation/lumen_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
+terragrunt init --source /Users/sasidarendinakaran/Documents/<Client>/Internals/Automation/<Client>_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
 
-terragrunt plan --source /Users/sasidarendinakaran/Documents/Lumen/Internals/Automation/lumen_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
+terragrunt plan --source /Users/sasidarendinakaran/Documents/<Client>/Internals/Automation/<Client>_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
 
-terragrunt apply --source /Users/sasidarendinakaran/Documents/Lumen/Internals/Automation/lumen_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
+terragrunt apply --source /Users/sasidarendinakaran/Documents/<Client>/Internals/Automation/<Client>_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
