@@ -5,7 +5,7 @@ include {
 locals {
   cloud_provider = get_env("CLOUD_PROVIDER", "azure")
   env            = get_env("ENV", "dev")
-  topic_path     = "${get_terragrunt_dir()}/topic1.yaml"
+  topic_path     = "${get_terragrunt_dir()}/${get_env("FILE_NAME")}"
   
 
   # Parse topic name from YAML (assumes only one topic)
