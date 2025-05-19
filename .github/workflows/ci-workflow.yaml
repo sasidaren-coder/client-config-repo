@@ -110,6 +110,9 @@ jobs:
             exit 1
           fi
 
+      - name: Print all environment variables
+        run: env
+      
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
