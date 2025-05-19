@@ -3,7 +3,7 @@ name: Confluent IaC CI Workflow
 on:
   pull_request:
     paths:
-      - '**/topics/*.yaml'
+      - '**/topics123/*.yaml'
 
 jobs:
   detect-changes:

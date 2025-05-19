@@ -1,0 +1,58 @@
+# ==============================
+# File: client-config-repo/.github/workflows/ci-trigger.yaml
+# Purpose: Trigger CI on PR, extract matrix, call reusable workflow
+# ==============================
+
+name: CI Trigger for Confluent IaC
+
+on:
+  pull_request:
+    paths:
+      - '**/topics/*.yaml'
+
+jobs:
+  detect-and-dispatch:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changed files
+        id: changed
+        uses: tj-actions/changed-files@v41
+        with:
+          files: '**/topics/*.yaml'
+
+      - name: Build matrix with cloud, env, file, and pipeline_version
+        id: set-matrix
+        run: |
+          echo "Building matrix..."
+          files_json=$(echo '${{ steps.changed.outputs.all_changed_files }}' | jq -R 'split(" ") | map(select(length > 0))')
+
+          matrix_entries=$(jq -n --argjson files "$files_json" ' [ $files[] | { file: ., cloud: (split("/")[0]), env: (split("/")[1]) } ]')
+
+          matrix_with_versions="["
+          for row in $(echo "$matrix_entries" | jq -c '.[]'); do
+            FILE=$(echo $row | jq -r '.file')
+            CLOUD=$(echo $row | jq -r '.cloud')
+            ENV=$(echo $row | jq -r '.env')
+            VERSION=$(yq e '.pipeline_version' "$FILE")
+            matrix_with_versions+="{\"file\": \"$FILE\", \"cloud\": \"$CLOUD\", \"env\": \"$ENV\", \"version\": \"$VERSION\"},"
+          done
+          matrix_with_versions=$(echo $matrix_with_versions | sed 's/,$//')"]"
+
+          echo "matrix=$(echo $matrix_with_versions | jq -c .)" >> "$GITHUB_OUTPUT"
+
+  run-workflow:
+    needs: detect-and-dispatch
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.detect-and-dispatch.outputs.matrix) }}
+    uses: sasidaren-coder/iac-repo/.github/workflows/ci-workflow.yaml
+    with:
+      file: ${{ matrix.file }}
+      cloud: ${{ matrix.cloud }}
+      env: ${{ matrix.env }}
+      version: ${{ matrix.version }}
+    secrets: inherit
