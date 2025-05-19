@@ -42,6 +42,9 @@ jobs:
           done
           matrix_with_versions=$(echo $matrix_with_versions | sed 's/,$//')"]"
 
+          echo "Generated Matrix:"
+          echo "$matrix_with_versions" | jq .
+
           echo "matrix=$(echo $matrix_with_versions | jq -c .)" >> "$GITHUB_OUTPUT"
 
   run-workflow:
