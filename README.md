@@ -20,6 +20,18 @@ export AZURE_RESOURCE_GROUP_NAME=<Azure RG>
 export AZURE_STORAGE_ACCOUNT_NAME=<Azure Storage Account>
 export AZURE_STORAGE_CONTAINER_NAME=<Azure Container name>
 
+
+Create AZ Service principal for CI/CD Pipeline to use to store state files in Azure Backend:
+az ad sp create-for-rbac --role="Contributor" \
+  --scopes="/subscriptions/<Subscription ID>" \
+  --name="github-terragrunt-sp"
+
+export ARM_CLIENT_ID=<Client ID>
+export ARM_CLIENT_SECRET=<Client Secret>
+export ARM_TENANT_ID=<Tenant ID>
+export ARM_SUBSCRIPTION_ID=<Subscription ID>
+
+
 terragrunt init --source /Users/sasidarendinakaran/Documents/Lumen/Internals/Automation/lumen_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
 
 terragrunt plan --source /Users/sasidarendinakaran/Documents/Lumen/Internals/Automation/lumen_automation_v2/local_tf_executions/terragrunt_impls/iac-modules/modules//kafka-topics
