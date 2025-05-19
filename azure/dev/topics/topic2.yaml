@@ -1,6 +1,6 @@
 pipeline_version: 1.0.0
 topic:
-  name: "tg-test01"
+  name: "tg-test02"
   partitions: 1
   config:
     cleanup.policy: "delete"
