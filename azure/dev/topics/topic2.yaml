@@ -1,4 +1,4 @@
-pipeline_version: 1.0.0
+use_pipeline_version: 1.0.0
 topic:
   name: "tg-test02"
   partitions: 1

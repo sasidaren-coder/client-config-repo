@@ -37,8 +37,9 @@ jobs:
             FILE=$(echo $row | jq -r '.file')
             CLOUD=$(echo $row | jq -r '.cloud')
             ENV=$(echo $row | jq -r '.env')
-            VERSION=$(yq e '.pipeline_version' "$FILE")
-            matrix_with_versions+="{\"file\": \"$FILE\", \"cloud\": \"$CLOUD\", \"env\": \"$ENV\", \"version\": \"$VERSION\"},"
+            USE_PIPELINE_VERSION=$(yq e '.use_pipeline_version' "$FILE")
+            PRIOR_PIPELINE_VERSION=$(yq e '.prior_pipeline_version' "$FILE")
+            matrix_with_versions+="{\"file\": \"$FILE\", \"cloud\": \"$CLOUD\", \"env\": \"$ENV\", \"use_pipeline_version\": \"$USE_PIPELINE_VERSION\", \"prior_pipeline_version\": \"$PRIOR_PIPELINE_VERSION\"},"
           done
           matrix_with_versions=$(echo $matrix_with_versions | sed 's/,$//')"]"
 
@@ -57,5 +58,6 @@ jobs:
       file: ${{ matrix.file }}
       cloud: ${{ matrix.cloud }}
       env: ${{ matrix.env }}
-      version: ${{ matrix.version }}
+      use_pipeline_version: ${{ matrix.use_pipeline_version }}
+      prior_pipeline_version: ${{ matrix.prior_pipeline_version }}
     secrets: inherit
